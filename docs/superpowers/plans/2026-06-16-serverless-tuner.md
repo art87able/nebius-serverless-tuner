@@ -683,7 +683,8 @@ SWEEP = Sweep(concurrency=1, input_tokens=32, output_tokens=10, n_requests=2)
 
 
 def _metrics(tput):
-    return Metrics(50, 10, tput, 1000, 1.0, 1, 2)
+    # tokens scale with throughput at fixed wall => higher tput = cheaper per token
+    return Metrics(50, 10, tput, tput, 1.0, 1, 2)
 
 
 def test_tune_picks_lowest_cost_and_respects_max_iters():
