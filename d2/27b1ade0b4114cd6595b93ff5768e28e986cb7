@@ -1,0 +1,19 @@
+docs/superpowers/specs/2026-06-16-serverless-tuner-design.md
+  s_f1e0bba350915d::t_b282e8c144ec78 1-149
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "d227b1ade0b4114cd6595b93ff5768e28e986cb7",
+  "prompts": {},
+  "sessions": {
+    "s_f1e0bba350915d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a905e98-84a5-4323-931b-96a336cb9199",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Artur Arapov <art87able@gmail.com>"
+    }
+  }
+}
