@@ -67,9 +67,19 @@ def _create_args(config: Config, name: str, token: str, subnet_id: str | None,
 
 
 def _parse_url(stdout: str) -> str:
-    """Pull the public endpoint URL out of the create response."""
+    """Build the OpenAI-compatible base URL from the create/get response.
+
+    Verified shape (nebius ai endpoint, 2026-06-16): the reachable address is
+    `status.public_endpoints[0]` as "IP:PORT" (no scheme) — turn it into
+    "http://IP:PORT/v1". Older guessed paths are kept as fallbacks.
+    """
     try:
         data = json.loads(stdout)
+        status = data.get("status", {}) if isinstance(data, dict) else {}
+        eps = status.get("public_endpoints") or []
+        if eps and isinstance(eps[0], str):
+            host = eps[0]
+            return f"http://{host}/v1" if "://" not in host else host.rstrip("/")
         for path in (("status", "url"), ("status", "endpoint_url"), ("metadata", "url")):
             node = data
             for key in path:
@@ -78,7 +88,7 @@ def _parse_url(stdout: str) -> str:
                 return node
     except json.JSONDecodeError:
         pass
-    m = re.search(r"https://\S+", stdout)
+    m = re.search(r"https?://\S+", stdout)
     if not m:
         raise DeployError(f"no endpoint URL in CLI output: {stdout!r}")
     return m.group(0)

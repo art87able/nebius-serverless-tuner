@@ -15,12 +15,13 @@ class FakeRunner:
 
 
 def test_deploy_builds_container_args_and_parses_url():
+    # real create/get shape: reachable address is status.public_endpoints[0] = "IP:PORT"
     runner = FakeRunner(CliResult(
-        stdout='{"metadata":{"id":"endpoint-123"},"status":{"url":"https://abc.endpoints.nebius.com/v1"}}',
+        stdout='{"metadata":{"id":"aiendpoint-123"},"status":{"public_endpoints":["195.242.28.162:8000"]}}',
         stderr="", returncode=0))
     url = deploy(Config(model="Qwen/Qwen2.5-1.5B-Instruct", quantization="fp8"),
                  runner, token="secret-token", subnet_id="subnet-1")
-    assert url == "https://abc.endpoints.nebius.com/v1"
+    assert url == "http://195.242.28.162:8000/v1"
     args = runner.calls[0]
     assert "create" in args
     assert "--image" in args            # container-based deploy
