@@ -1,0 +1,25 @@
+LICENSE
+  s_f1e0bba350915d::t_c08003f119eae8 1-21
+Dockerfile
+  s_f1e0bba350915d::t_dbdd192e72738e 1-8
+README.md
+  s_f1e0bba350915d::t_332000348d2f2a 1-119
+.env.example
+  s_f1e0bba350915d::t_d285bedc4022b1 1-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "54a6cd3955067dbd51650045dc74bfd71645b12d",
+  "prompts": {},
+  "sessions": {
+    "s_f1e0bba350915d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a905e98-84a5-4323-931b-96a336cb9199",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Artur Arapov <art87able@gmail.com>"
+    }
+  }
+}
