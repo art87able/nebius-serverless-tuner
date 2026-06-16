@@ -1,0 +1,19 @@
+docs/superpowers/plans/2026-06-16-serverless-tuner.md
+  s_f1e0bba350915d::t_fd53422a9d084b 1-1093
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "f03854892b7d1f1429a38d477629c59abaca0ba1",
+  "prompts": {},
+  "sessions": {
+    "s_f1e0bba350915d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a905e98-84a5-4323-931b-96a336cb9199",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Artur Arapov <art87able@gmail.com>"
+    }
+  }
+}
