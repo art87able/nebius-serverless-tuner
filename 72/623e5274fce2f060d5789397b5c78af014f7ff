@@ -1,0 +1,27 @@
+src/tuner/report.py
+  s_344b650cfa1068::t_fee5b0630bc94a 1-22
+src/tuner/adapters.py
+  s_344b650cfa1068::t_56a7b7eb091603 1-55
+tests/test_cli.py
+  s_344b650cfa1068::t_9dd3899d73c14b 1-16
+src/tuner/cli.py
+  s_344b650cfa1068::t_fa1c0d196d88bc 1-55
+tests/test_report.py
+  s_344b650cfa1068::t_cd60eb6dfec4ef 1-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "72623e5274fce2f060d5789397b5c78af014f7ff",
+  "prompts": {},
+  "sessions": {
+    "s_344b650cfa1068": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ece51-2705-7250-9b0b-15fc6301b89c",
+        "model": "gpt-5.5"
+      },
+      "human_author": "Artur Arapov <art87able@gmail.com>"
+    }
+  }
+}
