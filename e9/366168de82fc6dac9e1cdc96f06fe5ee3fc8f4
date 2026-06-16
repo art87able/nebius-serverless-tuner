@@ -1,0 +1,21 @@
+tests/test_deploy.py
+  s_f1e0bba350915d::t_9fff5a7bd38f02 18,20,24
+src/tuner/deploy.py
+  s_f1e0bba350915d::t_a6c77971c27c78 70-75,78-82,91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "e9366168de82fc6dac9e1cdc96f06fe5ee3fc8f4",
+  "prompts": {},
+  "sessions": {
+    "s_f1e0bba350915d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a905e98-84a5-4323-931b-96a336cb9199",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Artur Arapov <art87able@gmail.com>"
+    }
+  }
+}
