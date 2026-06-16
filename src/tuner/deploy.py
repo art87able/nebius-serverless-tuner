@@ -7,10 +7,12 @@ from tuner.config import Config
 
 # A Serverless Endpoint is a container deployment: a vLLM image on a GPU platform.
 # The model + vLLM serving config are passed through the container's --args, NOT as
-# dedicated CLI flags (verified against `nebius ai endpoint create` v0.12.x).
-DEFAULT_IMAGE = "vllm/vllm-openai:latest"   # pin to a Nebius-recommended tag during the live run
-DEFAULT_PLATFORM = "gpu-l40s-d"
-DEFAULT_PRESET = "1gpu-16vcpu-200gb"
+# dedicated CLI flags. Recipe verified against the Nebius deploy-model tutorial +
+# `nebius ai endpoint create` v0.12.x.
+DEFAULT_IMAGE = "vllm/vllm-openai:v0.18.0-cu130"
+DEFAULT_PLATFORM = "gpu-l40s-a"             # NVIDIA L40S PCIe
+DEFAULT_PRESET = "1gpu-8vcpu-32gb"
+CONTAINER_COMMAND = "python3 -m vllm.entrypoints.openai.api_server"
 CONTAINER_PORT = 8000
 
 
@@ -31,6 +33,7 @@ class DeployError(RuntimeError):
 
 def _vllm_args(config: Config) -> str:
     parts = ["--model", config.model,
+             "--host", "0.0.0.0", "--port", str(CONTAINER_PORT),
              "--dtype", config.dtype,
              "--max-num-seqs", str(config.max_num_seqs),
              "--max-model-len", str(config.max_model_len)]
@@ -39,20 +42,25 @@ def _vllm_args(config: Config) -> str:
     return " ".join(parts)
 
 
-def _create_args(config: Config, name: str, image: str, platform: str,
-                 preset: str, parent_id: str | None) -> list[str]:
+def _create_args(config: Config, name: str, token: str, subnet_id: str | None,
+                 image: str, platform: str, preset: str, parent_id: str | None) -> list[str]:
     args = [
         "nebius", "ai", "endpoint", "create",
         "--name", name,
         "--image", image,
+        "--container-command", CONTAINER_COMMAND,
+        "--args", _vllm_args(config),
         "--platform", platform,
         "--preset", preset,
-        "--container-port", str(CONTAINER_PORT),
         "--public",
+        "--container-port", str(CONTAINER_PORT),
         "--auth", "token",
-        "--args", _vllm_args(config),
+        "--token", token,
+        "--shm-size", "16Gi",
         "--format", "json",
     ]
+    if subnet_id:
+        args += ["--subnet-id", subnet_id]
     if parent_id:
         args += ["--parent-id", parent_id]
     return args
@@ -90,11 +98,16 @@ def _parse_id(stdout: str) -> str:
     raise DeployError(f"no endpoint id in CLI output: {stdout!r}")
 
 
-def deploy(config: Config, runner: CliRunner, *, name: str = "tuner-endpoint",
-           image: str = DEFAULT_IMAGE, platform: str = DEFAULT_PLATFORM,
-           preset: str = DEFAULT_PRESET, parent_id: str | None = None) -> str:
-    """Create the Serverless Endpoint and return its OpenAI-compatible base URL."""
-    res = runner.run(_create_args(config, name, image, platform, preset, parent_id))
+def deploy(config: Config, runner: CliRunner, *, token: str, subnet_id: str | None = None,
+           name: str = "tuner-endpoint", image: str = DEFAULT_IMAGE,
+           platform: str = DEFAULT_PLATFORM, preset: str = DEFAULT_PRESET,
+           parent_id: str | None = None) -> str:
+    """Create the Serverless Endpoint and return its OpenAI-compatible base URL.
+
+    `token` is the random bearer the endpoint will require; callers must use the same
+    token to authenticate benchmark requests.
+    """
+    res = runner.run(_create_args(config, name, token, subnet_id, image, platform, preset, parent_id))
     if res.returncode != 0:
         raise DeployError(res.stderr or "endpoint create failed")
     return _parse_url(res.stdout)

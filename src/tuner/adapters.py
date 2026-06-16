@@ -13,6 +13,15 @@ class SubprocessRunner:
         return CliResult(stdout=p.stdout, stderr=p.stderr, returncode=p.returncode)
 
 
+def get_subnet_id(runner) -> str:
+    """Resolve the tenant's first subnet id (needed by `endpoint create --subnet-id`)."""
+    res = runner.run(["nebius", "vpc", "subnet", "list",
+                      "--format", "jsonpath={.items[0].metadata.id}"])
+    if res.returncode != 0:
+        raise RuntimeError(res.stderr or "could not list subnets")
+    return res.stdout.strip()
+
+
 class HttpClient:
     """OpenAI-compatible chat client against a deployed endpoint."""
     def __init__(self, base_url: str, api_key: str, model: str):

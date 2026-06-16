@@ -1,6 +1,7 @@
 from __future__ import annotations
 import argparse
 import os
+import secrets
 import sys
 from tuner.config import Config, SearchSpace, Sweep
 from tuner.loop import tune
@@ -17,14 +18,15 @@ DEFAULT_SPACE = SearchSpace(dtypes=("auto", "bfloat16"),
 ENDPOINT_NAME = "tuner-endpoint"
 
 
-def make_deploy_fn():
+def make_deploy_fn(token: str):
     runner = adapters.SubprocessRunner()
-    return lambda cfg: deploy(cfg, runner, name=ENDPOINT_NAME)
+    subnet_id = adapters.get_subnet_id(runner)
+    return lambda cfg: deploy(cfg, runner, token=token, subnet_id=subnet_id, name=ENDPOINT_NAME)
 
 
-def make_bench_fn(sweep: Sweep):
+def make_bench_fn(sweep: Sweep, token: str):
     def bench_fn(url: str):
-        client = adapters.HttpClient(url, os.environ["NEBIUS_API_KEY"],
+        client = adapters.HttpClient(url, token,
                                      model=os.environ.get("ENDPOINT_MODEL", ""))
         return bench_run(client, sweep)
     return bench_fn
@@ -54,10 +56,11 @@ def main(argv=None) -> int:
 
     sweep = Sweep(concurrency=args.concurrency, input_tokens=128,
                   output_tokens=128, n_requests=args.requests)
+    token = secrets.token_hex(32)   # the endpoint's bearer, shared with the benchmark client
     try:
         result = tune(model=args.model, base_config=Config(model=args.model),
                       search_space=DEFAULT_SPACE, sweep=sweep, gpu_rate=args.gpu_rate,
-                      deploy_fn=make_deploy_fn(), bench_fn=make_bench_fn(sweep),
+                      deploy_fn=make_deploy_fn(token), bench_fn=make_bench_fn(sweep, token),
                       agent_fn=make_agent_fn(), max_iters=args.max_iters,
                       budget_usd=args.budget_usd)
         print(render(result))

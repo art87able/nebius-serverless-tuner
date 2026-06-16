@@ -18,22 +18,26 @@ def test_deploy_builds_container_args_and_parses_url():
     runner = FakeRunner(CliResult(
         stdout='{"metadata":{"id":"endpoint-123"},"status":{"url":"https://abc.endpoints.nebius.com/v1"}}',
         stderr="", returncode=0))
-    url = deploy(Config(model="Qwen/Qwen2.5-1.5B-Instruct", quantization="fp8"), runner)
+    url = deploy(Config(model="Qwen/Qwen2.5-1.5B-Instruct", quantization="fp8"),
+                 runner, token="secret-token", subnet_id="subnet-1")
     assert url == "https://abc.endpoints.nebius.com/v1"
     args = runner.calls[0]
     assert "create" in args
     assert "--image" in args            # container-based deploy
     assert "--public" in args
+    assert "--token" in args and "secret-token" in args
+    assert "--subnet-id" in args and "subnet-1" in args
     # model + serving config travel inside the single --args string
     vllm_args = args[args.index("--args") + 1]
     assert "Qwen/Qwen2.5-1.5B-Instruct" in vllm_args
     assert "fp8" in vllm_args
+    assert "--port 8000" in vllm_args
 
 
 def test_deploy_raises_on_nonzero():
     runner = FakeRunner(CliResult(stdout="", stderr="boom", returncode=1))
     with pytest.raises(DeployError):
-        deploy(Config(model="m"), runner)
+        deploy(Config(model="m"), runner, token="t")
 
 
 def test_teardown_resolves_name_to_id_then_deletes():
