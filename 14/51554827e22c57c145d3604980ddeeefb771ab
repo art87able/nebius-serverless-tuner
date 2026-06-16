@@ -1,0 +1,21 @@
+src/tuner/deploy.py
+  s_f1e0bba350915d::t_d8dab5f6daca04 8-15,32-43,47-53,56-57,62-79,81-90,93-97,104-109
+tests/test_deploy.py
+  s_f1e0bba350915d::t_dd7830606b4d90 7-10,13-14,17,19,23-30,37-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "1451554827e22c57c145d3604980ddeeefb771ab",
+  "prompts": {},
+  "sessions": {
+    "s_f1e0bba350915d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a905e98-84a5-4323-931b-96a336cb9199",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Artur Arapov <art87able@gmail.com>"
+    }
+  }
+}
