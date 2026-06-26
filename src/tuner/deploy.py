@@ -79,7 +79,8 @@ def _parse_url(stdout: str) -> str:
         eps = status.get("public_endpoints") or []
         if eps and isinstance(eps[0], str):
             host = eps[0]
-            return f"http://{host}/v1" if "://" not in host else host.rstrip("/")
+            base = host.rstrip("/") if "://" in host else f"http://{host}"
+            return base if base.endswith("/v1") else base + "/v1"
         for path in (("status", "url"), ("status", "endpoint_url"), ("metadata", "url")):
             node = data
             for key in path:
@@ -91,7 +92,8 @@ def _parse_url(stdout: str) -> str:
     m = re.search(r"https?://\S+", stdout)
     if not m:
         raise DeployError(f"no endpoint URL in CLI output: {stdout!r}")
-    return m.group(0)
+    base = m.group(0).rstrip("/")
+    return base if base.endswith("/v1") else base + "/v1"
 
 
 def _parse_id(stdout: str) -> str:

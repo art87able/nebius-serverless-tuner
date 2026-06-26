@@ -13,6 +13,33 @@ class SubprocessRunner:
         return CliResult(stdout=p.stdout, stderr=p.stderr, returncode=p.returncode)
 
 
+def wait_for_ready(base_url: str, api_key: str, *, timeout_s: float = 1200.0,
+                   interval_s: float = 15.0, get_fn=None, sleep_fn=time.sleep,
+                   now_fn=time.monotonic) -> None:
+    """Block until the deployed endpoint serves traffic, or raise after timeout.
+
+    `nebius ai endpoint create` returns the public address immediately, but the GPU
+    instance provisions + vLLM downloads the model for several minutes after that
+    (observed ~15-18 min cold start, 2026-06-16). Poll the OpenAI-compatible
+    `GET {base_url}/models` until it answers 200 so the benchmark never hits a
+    still-provisioning endpoint. `get_fn`/`sleep_fn`/`now_fn` are injectable for tests.
+    """
+    get = get_fn or requests.get
+    deadline = now_fn() + timeout_s
+    last = "no response yet"
+    while now_fn() < deadline:
+        try:
+            r = get(f"{base_url}/models",
+                    headers={"Authorization": f"Bearer {api_key}"}, timeout=10)
+            if r.status_code == 200:
+                return
+            last = f"status {r.status_code}"
+        except Exception as exc:  # connection refused while provisioning, etc.
+            last = str(exc)
+        sleep_fn(interval_s)
+    raise TimeoutError(f"endpoint {base_url} not ready after {timeout_s:.0f}s ({last})")
+
+
 def get_subnet_id(runner) -> str:
     """Resolve the tenant's first subnet id (needed by `endpoint create --subnet-id`)."""
     res = runner.run(["nebius", "vpc", "subnet", "list",

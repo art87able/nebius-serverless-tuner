@@ -41,6 +41,17 @@ def test_deploy_raises_on_nonzero():
         deploy(Config(model="m"), runner, token="t")
 
 
+def test_deploy_appends_v1_to_scheme_tunnel_url():
+    # Regression (2026-06-25 live run): the address can come back as a tunnel URL
+    # WITH a scheme; _parse_url must still append /v1, else we poll /models -> 404.
+    runner = FakeRunner(CliResult(
+        stdout='{"metadata":{"id":"aiendpoint-1"},"status":{"public_endpoints":'
+               '["https://port8000-abc.tunnel.applications.eu-north1.nebius.cloud"]}}',
+        stderr="", returncode=0))
+    url = deploy(Config(model="m"), runner, token="t")
+    assert url == "https://port8000-abc.tunnel.applications.eu-north1.nebius.cloud/v1"
+
+
 def test_teardown_resolves_name_to_id_then_deletes():
     runner = FakeRunner(
         CliResult(stdout='{"metadata":{"id":"endpoint-123"}}', stderr="", returncode=0),  # get-by-name

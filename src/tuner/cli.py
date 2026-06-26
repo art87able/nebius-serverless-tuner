@@ -21,7 +21,21 @@ ENDPOINT_NAME = "tuner-endpoint"
 def make_deploy_fn(token: str):
     runner = adapters.SubprocessRunner()
     subnet_id = adapters.get_subnet_id(runner)
-    return lambda cfg: deploy(cfg, runner, token=token, subnet_id=subnet_id, name=ENDPOINT_NAME)
+
+    def _deploy(cfg):
+        # The loop redeploys per config but only tears down once at the very end, so
+        # clear any prior endpoint of this name first (no-op on the first iteration)
+        # to avoid a name collision / leaked endpoint on iteration 2+.
+        try:
+            teardown(ENDPOINT_NAME, runner)
+        except Exception:
+            pass
+        url = deploy(cfg, runner, token=token, subnet_id=subnet_id, name=ENDPOINT_NAME)
+        # create returns before the GPU is serving; wait for vLLM to come up.
+        adapters.wait_for_ready(url, token)
+        return url
+
+    return _deploy
 
 
 def make_bench_fn(sweep: Sweep, token: str):

@@ -4,11 +4,17 @@ The offline build is complete and tested. This is the live phase: one bounded tu
 Nebius account + $100 promo credits, to capture proof. **Hard-bounded** by `--max-iters` and
 `--budget-usd`; the endpoint is always torn down in a `finally`.
 
-## Prereqs (confirmed 2026-06-16)
+## Prereqs — verified working 2026-06-20
 
-- `nebius` CLI v0.12.x installed + authenticated (profile `Artur [default]`).
-- A project/parent is configured in the CLI.
-- `$NEBIUS_API_KEY` (Token Factory) for the agent's brain.
+Access was re-verified end-to-end (the CLI's old default project was a stale/deleted ID that returned `PermissionDenied`/`NotFound`; repointed to the real one).
+
+- **CLI:** `nebius` v0.12.212 at `~/.nebius/bin/nebius`, profile `Artur [default]`, auth via Google federation. Re-auth with `nebius iam whoami` (opens browser OAuth) if the session lapses.
+- **Project (parent):** `project-e00w6e05pr004483zzrpzc` — set with `nebius config set parent-id project-e00w6e05pr004483zzrpzc` (tenant `tenant-e00spm0smz8kvpxn83`). The old `project-e00afte5...` is dead — don't use it.
+- **Verified read-only checks (no cost):**
+  - `nebius vpc subnet list --format jsonpath='{.items[0].metadata.id}'` → `vpcsubnet-e00w2mqf1grmxf2mvy` (the `SUBNET_ID` the deploy uses).
+  - `nebius ai endpoint list` → empty (API reachable; nothing running burning credits).
+- **`.env`:** created at repo root (gitignored) with `NEBIUS_API_KEY` (from the shell profile — Token Factory key, verified `HTTP 200` against `api.tokenfactory.nebius.com/v1/models`), `ENDPOINT_MODEL=Qwen/Qwen2.5-1.5B-Instruct`, `AGENT_LLM_BASE_URL=https://api.tokenfactory.nebius.com/v1`, `AGENT_LLM_MODEL=Qwen/Qwen3-30B-A3B-Instruct-2507`.
+- **$100 promo credits** live on the project above. **A real `tuner tune` run deploys a GPU endpoint and spends credits** — keep `--max-iters`/`--budget-usd` bounded and confirm teardown (`nebius ai endpoint list` empty) after.
 
 ## Verified recipe (Nebius deploy-model tutorial)
 
