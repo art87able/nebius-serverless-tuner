@@ -1,0 +1,40 @@
+tests/test_deploy.py
+  s_5db1b023255271::t_905ad0237033ae 44-54
+tests/test_ready.py
+  s_5db1b023255271::t_209c2da138a434 1-60
+src/tuner/cli.py
+  s_5db1b023255271::t_5ec1ab2225ac22 24-38
+docs/LIVE-RUNBOOK.md
+  s_1d19a2153cc9e7::t_9c7e9c2914a4a7 7,9-17
+src/tuner/adapters.py
+  s_5db1b023255271::t_e617cf71824e66 16-42
+src/tuner/deploy.py
+  s_5db1b023255271::t_48683fa75e380e 95-96
+  s_5db1b023255271::t_559e3a026b93f9 82-83
+BLOG.md
+  s_5db1b023255271::t_560fc122c89e6b 1-51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "70bcd8be64253ad3c13a9cafa2bf41ce73704e5e",
+  "prompts": {},
+  "sessions": {
+    "s_1d19a2153cc9e7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9975f480-9fa5-42e1-8b1a-0ce0a9e6c594",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Artur Arapov <art87able@gmail.com>"
+    },
+    "s_5db1b023255271": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0e0bc9b6-b8a1-4ab3-abac-0071eb63b701",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Artur Arapov <art87able@gmail.com>"
+    }
+  }
+}
