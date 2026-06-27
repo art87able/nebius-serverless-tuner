@@ -98,12 +98,14 @@ agent stopped.
 
 ## Proof it runs on Nebius
 
-_Filled during the live pass:_
+**Live run — 2026-06-25, Nebius L40S (`gpu-l40s-a`), `Qwen/Qwen2.5-1.5B-Instruct`:**
 
-- Endpoint URL: _<pending>_
-- Job logs: _see `proof/`_
-- Screenshots: _see `proof/`_
-- Real report: `examples/sample-report.md` (replaces the schema sample)
+- The agent tuned `dtype: auto → bfloat16` and cut cost **$1.2612 → $1.0253 per 1M tokens** (≈19%),
+  raising throughput `341 → 420 tok/s` on the same GPU.
+- Bounded (`--max-iters 3 --budget-usd 5`), ran end-to-end in ~18 min, **torn down in `finally`** —
+  `nebius ai endpoint list` empty afterwards (~$0.50 total spend).
+- Raw log: [`proof/live-run-2026-06-25-run2.log`](proof/live-run-2026-06-25-run2.log).
+- Real report (with honest caveats on the latency columns): [`examples/sample-report.md`](examples/sample-report.md).
 
 ## Tests
 
