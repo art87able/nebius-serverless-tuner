@@ -1,0 +1,21 @@
+examples/sample-report.md
+  s_63223dc23ef619::t_b455e5e6c08d0a 1-4,10-11,13,15-30
+README.md
+  s_63223dc23ef619::t_a0889e7ca7a4b9 101-108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "f08085c24cb1960cab7c5f1ebd0272f69792d524",
+  "prompts": {},
+  "sessions": {
+    "s_63223dc23ef619": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "efb85057-ddd7-4383-9a3a-2851afc4286f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Artur Arapov <art87able@gmail.com>"
+    }
+  }
+}
