@@ -1,0 +1,20 @@
+BLOG.md
+  s_16fd40127397a9::t_f962e738babbc2 13,15,17-19,21,23,25-33
+  s_16fd40127397a9::t_1497bf6b091345 44,46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "73332edeeab590f8d6fd4610d81d148e295d231c",
+  "prompts": {},
+  "sessions": {
+    "s_16fd40127397a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "45aa51e1-cf6e-4d33-a31d-97667a381b5e",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Artur Arapov <art87able@gmail.com>"
+    }
+  }
+}
