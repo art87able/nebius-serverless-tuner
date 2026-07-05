@@ -99,7 +99,7 @@ def endpoint_llm_generate(get_url, api_key: str, model: str):
 
 
 def llm_generate(prompt: str) -> str:
-    """The agent's brain — uses Nebius Token Factory (cheap) by default."""
+    """The agent's brain — any OpenAI-compatible chat API via AGENT_LLM_BASE_URL."""
     base = os.environ.get("AGENT_LLM_BASE_URL", "https://api.tokenfactory.nebius.com/v1")
     key = os.environ["NEBIUS_API_KEY"]
     model = os.environ.get("AGENT_LLM_MODEL", "Qwen/Qwen3-30B-A3B-Instruct-2507")

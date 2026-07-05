@@ -4,3 +4,4 @@ __pycache__/
 .env
 results/
 *.log
+docs/LIVE-RUNBOOK.md
