@@ -1,0 +1,24 @@
+README.md
+  s_16fd40127397a9::t_125116425ec2ec 133
+  s_16fd40127397a9::t_96b8ae21ae5bec 122-124
+examples/sample-report.md
+  s_16fd40127397a9::t_38840fe9464136 44-46
+  s_16fd40127397a9::t_70c931a15dcf37 22
+  s_16fd40127397a9::t_6073b041ab211f 28-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "b7d686733e32c26225af7b2b0370c60fc47d8ce5",
+  "prompts": {},
+  "sessions": {
+    "s_16fd40127397a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "45aa51e1-cf6e-4d33-a31d-97667a381b5e",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Artur Arapov <art87able@gmail.com>"
+    }
+  }
+}
