@@ -1,0 +1,48 @@
+examples/sample-report.md
+  s_16fd40127397a9::t_3ac74e4ff54064 31-46
+job-entrypoint.sh
+  s_16fd40127397a9::t_57c5a00b1d5e89 1-16
+README.md
+  s_16fd40127397a9::t_9c5adc3c2b9999 87,89,91,94,97-99,105-107
+  s_16fd40127397a9::t_180a48ca52c125 80-86,88,90,92-93,95-96,100-104,108
+  s_16fd40127397a9::t_600928522c0662 139-147
+Dockerfile
+  s_16fd40127397a9::t_4443345f1668e3 4-9,14-16
+src/tuner/adapters.py
+  s_16fd40127397a9::t_6efb7277d4779e 81-100
+src/tuner/cli.py
+  s_16fd40127397a9::t_9438a316621580 91
+  s_16fd40127397a9::t_b70f95288d0e24 53-58,60
+  s_16fd40127397a9::t_320bc45d64d856 21,36-37
+  s_16fd40127397a9::t_d86538342c81e6 51-52,59
+  s_16fd40127397a9::t_e81284ac943c4e 85,89-90
+BLOG.md
+  s_16fd40127397a9::t_5be745fa27760f 7
+  s_16fd40127397a9::t_a83c12a6b4169d 50
+  s_16fd40127397a9::t_f3cd82190fa333 46
+  s_16fd40127397a9::t_930d45d2a8ac7c 39-40
+  s_16fd40127397a9::t_07ae349a6fedf8 18
+  s_16fd40127397a9::t_e9a92388268bd7 24
+tests/test_cli.py
+  s_16fd40127397a9::t_b9354ccc682cc1 26,28
+  s_16fd40127397a9::t_025c3e83ee8dbd 8,10
+  s_16fd40127397a9::t_f8c6482348494e 35-78
+proof/job-run-2026-07-05-run2.log
+  s_16fd40127397a9::t_3f52b16103a283 1-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "f151b225a37528490a6f46a0726a77fc582fce26",
+  "prompts": {},
+  "sessions": {
+    "s_16fd40127397a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "45aa51e1-cf6e-4d33-a31d-97667a381b5e",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Artur Arapov <art87able@gmail.com>"
+    }
+  }
+}
