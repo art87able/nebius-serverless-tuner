@@ -38,11 +38,11 @@ The agent tried the default (`auto`) first, then proposed `bfloat16`, measured a
 
 And the full loop also ran **as an actual Serverless Job** (2026-07-05): a CPU-only `cpu-d3` Job container authenticated the `nebius` CLI from a short-lived IAM token (stored in MysteryBox, injected via `--env-secret` — never in the job spec), deployed the L40S endpoint, benchmarked it at ~1,000 tok/s ($0.55/1M), consulted the endpoint-hosted agent, and tore everything down — job state `COMPLETED`, endpoint list empty. Same code, zero laptop involvement.
 
-## What I learned
+## Practical notes
 
-- **Endpoints return before they're ready.** The create call hands back the address while the GPU is still provisioning and vLLM is still downloading the model (~15 min cold start). Benchmarking immediately fails; a readiness poll is mandatory. I learned this by watching a run sit at a 404 for 20 minutes.
-- **The address shape isn't fixed.** Sometimes the reachable address comes back as a bare `IP:PORT`, sometimes as an `https://…tunnel…nebius.cloud` URL. My URL builder had to always append `/v1` regardless — a one-line bug that cost a whole run, now covered by a regression test.
-- **Serverless makes the cost loop safe.** Because you only pay while the endpoint is up, a bounded auto-tuner is cheap to run, and the `finally`-teardown means a crash can't leave a GPU billing.
+- **Endpoints return before they're ready.** The create call hands back the address while the GPU is still provisioning and vLLM is still downloading the model (~15 min cold start). Benchmarking immediately fails; poll the API until it answers first.
+- **The address shape isn't fixed.** Sometimes the reachable address comes back as a bare `IP:PORT`, sometimes as an `https://…tunnel…nebius.cloud` URL. The tuner appends `/v1` to whichever shape comes back (covered by a regression test).
+- **Bounded cost experiments are cheap — with one condition.** You only pay while the endpoint is up, but release it in a `finally`: a crash otherwise leaves a GPU billing.
 - **The model under test can be its own tuning brain.** Routing the agent's calls to the endpoint the tuner just deployed removes the only external dependency: one late-bound URL, and the whole system runs self-contained on Serverless.
 
 ## Try it
