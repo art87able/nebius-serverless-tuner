@@ -1,0 +1,14 @@
+=== run2 launch 2026-06-25T23:31:53Z ===
+No endpoints or jobs
+# Tuning report — Qwen/Qwen2.5-1.5B-Instruct
+
+| # | dtype | max_num_seqs | quant | ttft ms | tpot ms | tok/s | cost/1M ($) |
+|---|-------|--------------|-------|---------|---------|-------|-------------|
+| 1 | auto | 256 | None | 793.38 | 0.0 | 341.34 | 1.2612 |
+| 2 | bfloat16 | 256 | None | 705.55 | 0.0 | 419.96 | 1.0253 |
+
+**Winning config:** dtype=bfloat16, max_num_seqs=256, quant=None → $1.0253/1M tokens (ttft 705.55 ms, tpot 0.0 ms)
+
+_Stopped: max_iters reached_
+=== EXIT 0 2026-06-25T23:49:55Z ===
+No endpoints or jobs
