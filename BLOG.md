@@ -4,7 +4,7 @@
 
 ## The 100-word version
 
-Serving an open LLM has a dozen knobs — dtype, quantization, batch sizing — and the wrong combo quietly doubles your cost per token. **Nebius Serverless Tuner** automates the search: a Nebius Serverless **Job** runs the whole loop — deploy the model as a Serverless **Endpoint** (vLLM), benchmark it under load, and let an LLM agent (served by that same endpoint) propose new serving configs to minimize **$/1M tokens** — then writes an honest cost report and tears everything down. On a live L40S run it tuned `auto → bfloat16` and cut cost from **$1.26 → $1.03 per 1M tokens** automatically. Built test-first; the endpoint is always released in a `finally`.
+Serving an open LLM has a dozen knobs — dtype, quantization, batch sizing — and the wrong combo quietly doubles your cost per token. **Nebius Serverless Tuner** automates the search: a Nebius Serverless **Job** runs the whole loop — deploy the model as a Serverless **Endpoint** (vLLM), benchmark it under load, and let an LLM agent (served by that same endpoint) propose new serving configs to minimize **$/1M tokens** — then writes a cost report and tears everything down. On a live L40S run it tuned `auto → bfloat16` and cut cost from **$1.26 → $1.03 per 1M tokens** automatically. Built test-first; the endpoint is always released in a `finally`.
 
 ## The problem
 
@@ -23,7 +23,7 @@ Around that sits a tuning loop:
 2. **Benchmark** it and compute **cost per 1M tokens** = GPU-$/hr × wall-seconds ÷ output-tokens.
 3. An **LLM agent** looks at the history so far and proposes the next config to try from a small search space (dtype, max-num-seqs, fp8 quantization), or stops. The neat part: with `AGENT_LLM_BASE_URL=endpoint` the agent's brain is **the deployed endpoint itself** — the model under test does its own tuning, so the run needs no external LLM API at all.
 4. **Redeploy** the new config (tearing the previous endpoint down first), repeat — bounded by `--max-iters` and `--budget-usd`.
-5. **Report**: the winning config, a per-iteration table, and the honest cost numbers — then tear the endpoint down in a `finally` so nothing keeps billing.
+5. **Report**: the winning config, a per-iteration table, and the measured cost numbers — then tear the endpoint down in a `finally` so nothing keeps billing.
 
 ## The live result
 
@@ -38,16 +38,16 @@ The agent tried the default (`auto`) first, then proposed `bfloat16`, measured a
 
 And the full loop also ran **as an actual Serverless Job** (2026-07-05): a CPU-only `cpu-d3` Job container authenticated the `nebius` CLI from a short-lived IAM token (stored in MysteryBox, injected via `--env-secret` — never in the job spec), deployed the L40S endpoint, benchmarked it at ~1,000 tok/s ($0.55/1M), consulted the endpoint-hosted agent, and tore everything down — job state `COMPLETED`, endpoint list empty. Same code, zero laptop involvement.
 
-## What I learned (the honest part)
+## What I learned
 
 - **Endpoints return before they're ready.** The create call hands back the address while the GPU is still provisioning and vLLM is still downloading the model (~15 min cold start). Benchmarking immediately fails; a readiness poll is mandatory. I learned this by watching a run sit at a 404 for 20 minutes.
 - **The address shape isn't fixed.** Sometimes the reachable address comes back as a bare `IP:PORT`, sometimes as an `https://…tunnel…nebius.cloud` URL. My URL builder had to always append `/v1` regardless — a one-line bug that cost a whole run, now covered by a regression test.
-- **Serverless makes the cost loop safe.** Because you only pay while the endpoint is up, a bounded auto-tuner is cheap to run (this whole experiment was ~$0.50) and the `finally`-teardown means a crash can't leave a GPU billing.
-- **The model under test can be its own tuning brain.** When I lost access to an external LLM API mid-project, the fix was better than the original: route the agent's calls to the endpoint the tuner just deployed. One late-bound URL, no extra dependency, and the whole system became self-contained on Serverless.
+- **Serverless makes the cost loop safe.** Because you only pay while the endpoint is up, a bounded auto-tuner is cheap to run, and the `finally`-teardown means a crash can't leave a GPU billing.
+- **The model under test can be its own tuning brain.** Routing the agent's calls to the endpoint the tuner just deployed removes the only external dependency: one late-bound URL, and the whole system runs self-contained on Serverless.
 
 ## Try it
 
-The tool is open source, test-first (24 unit tests, all the live seams faked so it runs fully offline), and bounded by design. Point it at a model and a GPU rate, and it'll tell you the cheapest way to serve it — with the benchmark to prove it.
+The tool is open source, test-first (24 unit tests that run fully offline), and bounded by design. Point it at a model and a GPU rate, and it'll tell you the cheapest way to serve it — with the benchmark to prove it.
 
 `github.com/art87able/nebius-serverless-tuner`
 
