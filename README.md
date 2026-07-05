@@ -3,7 +3,7 @@
 **An agent that does AI performance engineering for you on Nebius Serverless.** Point it at any
 open model; it deploys the model as a Nebius Serverless **Endpoint** (vLLM), benchmarks it from a
 Serverless **Job**, then an LLM **agent** reads the results, proposes a better serving config,
-redeploys, re-benchmarks — and hands you an honest **cost-per-token report, the winning config,
+redeploys, re-benchmarks — and hands you a **cost-per-token report, the winning config,
 and the reasoning trace.**
 
 > Entry for the **Nebius Serverless AI Builders Challenge** (#NebiusServerlessChallenge).
@@ -134,7 +134,7 @@ agent stopped.
 - Bounded (`--max-iters 3 --budget-usd 5`), ran end-to-end in ~18 min, **torn down in `finally`** —
   `nebius ai endpoint list` empty afterwards (~$0.50 total spend).
 - Raw log: [`proof/live-run-2026-06-25-run2.log`](proof/live-run-2026-06-25-run2.log).
-- Real report (with honest caveats on the latency columns): [`examples/sample-report.md`](examples/sample-report.md).
+- Real report (with the measurement caveats on the latency columns): [`examples/sample-report.md`](examples/sample-report.md).
 
 **Live run as a Serverless Job — 2026-07-05, self-contained (endpoint-as-agent-brain):**
 
