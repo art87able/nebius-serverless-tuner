@@ -19,15 +19,14 @@ _Stopped: max_iters reached_
 **Measurement notes**
 
 - **The agent cut cost ~19%** (`$1.2612 → $1.0253` per 1M output tokens) by switching `dtype: auto → bfloat16`,
-  which raised throughput `341 → 420 tok/s` on the same GPU. That delta — found and measured automatically —
-  is the result that matters.
+  which raised throughput `341 → 420 tok/s` on the same GPU.
 - **`tpot` reads `0.0` and `ttft` is really *total request latency*.** The benchmark uses the non-streaming
   chat-completions path, which returns one response after the full generation, so time-to-first-token can't be
   separated from per-output-token time (`adapters.py`). The `ttft` column is therefore the whole-request median,
   and `tpot` is unmeasured (recorded as 0). Cost/1M and tok/s are derived from total wall-time ÷ output tokens
   and are unaffected. A streaming benchmark variant (real TTFT + TPOT) is the obvious next improvement.
-- **The fp8 row from the earlier schema sample didn't run** — this bounded pass stopped at `--max-iters` after
-  two iterations rather than exhausting the search space.
+- **fp8 quantization was not reached** — the bounded pass stopped at `--max-iters` after two iterations,
+  before exhausting the search space.
 
 ---
 
@@ -42,5 +41,6 @@ the deployed endpoint itself via `AGENT_LLM_BASE_URL=endpoint`; raw log + job me
 
 Note: the endpoint-hosted agent (the 1.5B model tuning itself) re-proposed the same config,
 so iteration 2 is effectively a **repeat measurement** — useful as a run-to-run variance check
-(~8% on tok/s), not a tuning win. The tuning win above came from the larger-brain run; the Job run
-proves the end-to-end serverless execution path (Job → Endpoint → benchmark → agent → teardown).
+(~8% on tok/s), not a tuning win. The tuning win above came from the 2026-06-25 run, which used a
+larger agent model; this run demonstrates the end-to-end serverless execution path
+(Job → Endpoint → benchmark → agent → teardown).

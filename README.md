@@ -119,11 +119,9 @@ agent stopped.
 - **Job (tuner):** CPU-only — it just issues HTTP requests and a few agent calls.
 - **Runtime:** ≈ a few minutes per iteration (deploy + warm-up + benchmark); a 3-iteration run is
   well under an hour.
-- **Cost:** dominated by Endpoint GPU-hours during benchmarking. A bounded 3-iteration run on a
-  small model stays inside the challenge's **$100 promo credits**; `--budget-usd` enforces it.
-
-> Exact GPU rates and the precise `nebius ai endpoint create` flags are pinned against live docs +
-> a real run; `deploy.py` isolates every CLI call so adjusting them touches one function.
+- **Cost:** dominated by Endpoint GPU-hours during benchmarking; `--budget-usd` puts a hard cap
+  on it. GPU rates vary by platform — `deploy.py` isolates every CLI call, so adjusting rates or
+  `endpoint create` flags touches one function.
 
 ## Proof it runs on Nebius
 
@@ -132,7 +130,7 @@ agent stopped.
 - The agent tuned `dtype: auto → bfloat16` and cut cost **$1.2612 → $1.0253 per 1M tokens** (≈19%),
   raising throughput `341 → 420 tok/s` on the same GPU.
 - Bounded (`--max-iters 3 --budget-usd 5`), ran end-to-end in ~18 min, **torn down in `finally`** —
-  `nebius ai endpoint list` empty afterwards (~$0.50 total spend).
+  `nebius ai endpoint list` empty afterwards.
 - Raw log: [`proof/live-run-2026-06-25-run2.log`](proof/live-run-2026-06-25-run2.log).
 - Real report (with the measurement caveats on the latency columns): [`examples/sample-report.md`](examples/sample-report.md).
 
