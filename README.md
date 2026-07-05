@@ -129,7 +129,7 @@ agent stopped.
 
 - The agent tuned `dtype: auto → bfloat16` and cut cost **$1.2612 → $1.0253 per 1M tokens** (≈19%),
   raising throughput `341 → 420 tok/s` on the same GPU.
-- Bounded (`--max-iters 3 --budget-usd 5`), ran end-to-end in ~18 min, **torn down in `finally`** —
+- Bounded (`--max-iters 2 --budget-usd 5`), ran end-to-end in ~18 min, **torn down in `finally`** —
   `nebius ai endpoint list` empty afterwards.
 - Raw log: [`proof/live-run-2026-06-25-run2.log`](proof/live-run-2026-06-25-run2.log).
 - Real report (with the measurement caveats on the latency columns): [`examples/sample-report.md`](examples/sample-report.md).

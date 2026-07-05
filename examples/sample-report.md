@@ -1,6 +1,6 @@
 > **Real live run** — captured 2026-06-25 on a Nebius L40S endpoint (`gpu-l40s-a`, `1gpu-8vcpu-32gb`)
-> serving `Qwen/Qwen2.5-1.5B-Instruct`. Bounded `--max-iters 3 --budget-usd 5`; the agent stopped at
-> max-iters. Endpoint torn down in `finally` — `nebius ai endpoint list` empty afterwards (~$0.50 total).
+> serving `Qwen/Qwen2.5-1.5B-Instruct`. Bounded `--max-iters 2 --budget-usd 5`; the run stopped at
+> max-iters. Endpoint torn down in `finally` — `nebius ai endpoint list` empty afterwards.
 > Raw log: [`proof/live-run-2026-06-25-run2.log`](../proof/live-run-2026-06-25-run2.log).
 
 # Tuning report — Qwen/Qwen2.5-1.5B-Instruct
