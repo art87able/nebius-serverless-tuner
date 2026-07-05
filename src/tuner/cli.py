@@ -18,7 +18,7 @@ DEFAULT_SPACE = SearchSpace(dtypes=("auto", "bfloat16"),
 ENDPOINT_NAME = "tuner-endpoint"
 
 
-def make_deploy_fn(token: str):
+def make_deploy_fn(token: str, url_holder: dict | None = None):
     runner = adapters.SubprocessRunner()
     subnet_id = adapters.get_subnet_id(runner)
 
@@ -33,6 +33,8 @@ def make_deploy_fn(token: str):
         url = deploy(cfg, runner, token=token, subnet_id=subnet_id, name=ENDPOINT_NAME)
         # create returns before the GPU is serving; wait for vLLM to come up.
         adapters.wait_for_ready(url, token)
+        if url_holder is not None:
+            url_holder["url"] = url
         return url
 
     return _deploy
@@ -46,7 +48,16 @@ def make_bench_fn(sweep: Sweep, token: str):
     return bench_fn
 
 
-def make_agent_fn():
+def make_agent_fn(token: str | None = None, url_holder: dict | None = None,
+                  model: str | None = None):
+    # Self-contained mode: AGENT_LLM_BASE_URL=endpoint makes the tuner's own deployed
+    # endpoint the agent's brain — no external LLM API needed. The loop calls the agent
+    # right after benchmarking, while the current endpoint is still serving.
+    if os.environ.get("AGENT_LLM_BASE_URL") == "endpoint" and url_holder is not None:
+        generate = adapters.endpoint_llm_generate(
+            lambda: url_holder.get("url"), token or "",
+            os.environ.get("ENDPOINT_MODEL") or model or "")
+        return lambda hist, space: propose(hist, space, generate)
     return lambda hist, space: propose(hist, space, adapters.llm_generate)
 
 
@@ -71,11 +82,13 @@ def main(argv=None) -> int:
     sweep = Sweep(concurrency=args.concurrency, input_tokens=128,
                   output_tokens=128, n_requests=args.requests)
     token = secrets.token_hex(32)   # the endpoint's bearer, shared with the benchmark client
+    url_holder: dict = {"url": None}   # current endpoint URL, for endpoint-as-agent-brain mode
     try:
         result = tune(model=args.model, base_config=Config(model=args.model),
                       search_space=DEFAULT_SPACE, sweep=sweep, gpu_rate=args.gpu_rate,
-                      deploy_fn=make_deploy_fn(token), bench_fn=make_bench_fn(sweep, token),
-                      agent_fn=make_agent_fn(), max_iters=args.max_iters,
+                      deploy_fn=make_deploy_fn(token, url_holder),
+                      bench_fn=make_bench_fn(sweep, token),
+                      agent_fn=make_agent_fn(token, url_holder, args.model), max_iters=args.max_iters,
                       budget_usd=args.budget_usd)
         print(render(result))
         return 0

@@ -77,6 +77,35 @@ tuner tune \
 - `--gpu-rate` is the USD/hour for the GPU you deploy on (from Nebius pricing).
 - `--max-iters` and `--budget-usd` are **hard caps** — the loop stops at whichever it hits first.
 
+### Run it as a Nebius Serverless Job
+
+The same loop runs fully inside a **Serverless AI Job** — the Job drives the agent + benchmark,
+deploys/tears down the Endpoint from within the container ([`job-entrypoint.sh`](job-entrypoint.sh)
+authenticates the in-container `nebius` CLI from a short-lived IAM token):
+
+```bash
+docker buildx build --platform linux/amd64 -t $REGISTRY/tuner:job-v2 . && docker push $REGISTRY/tuner:job-v2
+
+# store the (short-lived) IAM token in MysteryBox — never in the job spec:
+nebius mysterybox secret create --parent-id $PROJECT --name tuner-job-creds \
+  --secret-version-payload "[{\"key\":\"NEBIUS_IAM_TOKEN\",\"string_value\":\"$(nebius iam get-access-token)\"}]"
+
+nebius ai job create --parent-id $PROJECT --name tuner-job \
+  --image $REGISTRY/tuner:job-v2 \
+  --args "tune --model Qwen/Qwen2.5-1.5B-Instruct --gpu l40s --gpu-rate 2.00 --max-iters 2 --budget-usd 5 --concurrency 8 --requests 16" \
+  --platform cpu-d3 --preset 4vcpu-16gb --subnet-id $SUBNET_ID --timeout 2h \
+  --env-secret NEBIUS_IAM_TOKEN=tuner-job-creds \
+  --env NEBIUS_PARENT_ID=$PROJECT --env ENDPOINT_MODEL=Qwen/Qwen2.5-1.5B-Instruct \
+  --env AGENT_LLM_BASE_URL=endpoint
+
+nebius ai job logs $(nebius ai job get-by-name --name tuner-job --format jsonpath='{.metadata.id}') --follow
+```
+
+The Job is CPU-only (`cpu-d3`); the GPU lives solely in the Endpoint it manages.
+`AGENT_LLM_BASE_URL=endpoint` makes the run **self-contained**: the agent's brain is the very
+endpoint the tuner deploys (late-bound to the current iteration's URL), so no external LLM API
+key is needed — the only credential the Job carries is a short-lived IAM token.
+
 ### Expected output
 
 A markdown report like [`examples/sample-report.md`](examples/sample-report.md): a per-iteration
@@ -106,6 +135,15 @@ agent stopped.
   `nebius ai endpoint list` empty afterwards (~$0.50 total spend).
 - Raw log: [`proof/live-run-2026-06-25-run2.log`](proof/live-run-2026-06-25-run2.log).
 - Real report (with honest caveats on the latency columns): [`examples/sample-report.md`](examples/sample-report.md).
+
+**Live run as a Serverless Job — 2026-07-05, self-contained (endpoint-as-agent-brain):**
+
+- The full loop ran **inside a Serverless AI Job** (`cpu-d3`, CPU-only): the container authenticated
+  the in-baked `nebius` CLI from a MysteryBox-injected IAM token, deployed the L40S endpoint,
+  benchmarked ~**1,016 tok/s** at **$0.5466 / 1M tokens**, and consulted the agent served by
+  **the deployed endpoint itself** (`AGENT_LLM_BASE_URL=endpoint`) — no external LLM API.
+- Job finished `COMPLETED`; `nebius ai endpoint list` empty afterwards (teardown in `finally`).
+- Raw log + job metadata: [`proof/job-run-2026-07-05-run2.log`](proof/job-run-2026-07-05-run2.log).
 
 ## Tests
 

@@ -1,0 +1,41 @@
+# Tuning report — Qwen/Qwen2.5-1.5B-Instruct
+
+| # | dtype | max_num_seqs | quant | ttft ms | tpot ms | tok/s | cost/1M ($) |
+|---|-------|--------------|-------|---------|---------|-------|-------------|
+| 1 | auto | 256 | None | 410.48 | 0.0 | 1016.14 | 0.5466 |
+| 2 | auto | 256 | None | 410.68 | 0.0 | 937.26 | 0.5928 |
+
+**Winning config:** dtype=auto, max_num_seqs=256, quant=None → $0.5466/1M tokens (ttft 410.48 ms, tpot 0.0 ms)
+
+_Stopped: max_iters reached_
+
+---
+# Proof of Serverless Job run (captured 2026-07-05T17:10Z)
+Job:
+  ID:       aijob-e00fpy08zs7dvz662a
+  Name:     tuner-job-2
+  State:    COMPLETED
+  Created:  45 minutes ago
+
+Container:
+  Image:  cr.eu-north1.nebius.cloud/e00pzryxfatc3kkepr/tuner:job-v2
+  Args:   tune --model Qwen/Qwen2.5-1.5B-Instruct --gpu l40s --gpu-rate 2.00 --max-iters 2 --budget-usd 5 --concurrency 8 --requests 16
+
+Resources:
+  Platform:  cpu-d3
+  Preset:    4vcpu-16gb
+  Disk:      250 GiB (NETWORK_SSD)
+
+Instances:
+    COMPUTE INSTANCE                    PRIVATE IP  PUBLIC IP  STATE
+    computeinstance-e00gwqfccj72s2zy6d  10.0.0.52   -          RUNNING
+
+Metadata:
+  Timeout:           7200s
+  Parent ID:         project-e00w6e05pr004483zzrpzc
+  Resource Version:  1
+  Subnet:            vpcsubnet-e00w2mqf1grmxf2mvy
+
+
+# Endpoint teardown check after completion:
+No endpoints or jobs

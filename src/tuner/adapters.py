@@ -78,6 +78,26 @@ class HttpClient:
                              output_tokens=out_tok)
 
 
+def endpoint_llm_generate(get_url, api_key: str, model: str):
+    """Agent brain served by the tuner's own deployed endpoint (self-contained mode).
+
+    `get_url` is late-bound: the endpoint URL only exists after the first deploy,
+    and the loop calls the agent while the current endpoint is still up.
+    """
+    def generate(prompt: str) -> str:
+        base = get_url()
+        if not base:
+            raise RuntimeError("agent called before any endpoint was deployed")
+        r = requests.post(f"{base.rstrip('/')}/chat/completions",
+                          headers={"Authorization": f"Bearer {api_key}"},
+                          json={"model": model,
+                                "messages": [{"role": "user", "content": prompt}],
+                                "max_tokens": 256, "temperature": 0}, timeout=120)
+        r.raise_for_status()
+        return r.json()["choices"][0]["message"]["content"]
+    return generate
+
+
 def llm_generate(prompt: str) -> str:
     """The agent's brain — uses Nebius Token Factory (cheap) by default."""
     base = os.environ.get("AGENT_LLM_BASE_URL", "https://api.tokenfactory.nebius.com/v1")
