@@ -1,0 +1,23 @@
+src/tuner/adapters.py
+  s_16fd40127397a9::t_3ed23e9d42ca6a 102
+.env.example
+  s_16fd40127397a9::t_4469a2d956e737 3,9-15
+.gitignore
+  s_16fd40127397a9::t_f78eacc260b760 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "ac121b9fff40c88e6895775f26ae884b786eb6ad",
+  "prompts": {},
+  "sessions": {
+    "s_16fd40127397a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "45aa51e1-cf6e-4d33-a31d-97667a381b5e",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Artur Arapov <art87able@gmail.com>"
+    }
+  }
+}
